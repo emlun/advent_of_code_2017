@@ -13,7 +13,7 @@ object Day24 extends App {
   }
 
   def validContinuations(prefix: List[Part], parts: Set[Part]): Iterator[List[Part]] = {
-    val startValue = (prefix.headOption map { _.b } getOrElse 0)
+    val startValue = prefix.headOption map { _.b } getOrElse 0
     val starts = parts filter { p => p.a == startValue || p.b == startValue }
 
     if (starts.isEmpty)
