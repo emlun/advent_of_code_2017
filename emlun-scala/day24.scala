@@ -1,5 +1,33 @@
 object Day24 extends App {
 
+  object Multiset {
+    def apply[A](items: Iterable[A]): Multiset[A] = new Multiset(items)
+  }
+  case class Multiset[A](items: Map[A, Int]) extends Iterable[A] {
+    def this(items: Iterable[A]) =
+      this(items.foldLeft(Map.empty[A, Int]) { (result, item) =>
+        result.updated(item, (result get item getOrElse 0) + 1)
+      })
+
+    def -(item: A): Multiset[A] = {
+      val count: Int = items get item getOrElse 0
+      Multiset(
+        if (count > 1)
+          items.updated(item, count - 1)
+        else
+          items - item
+      )
+    }
+
+    override def filter(pred: A => Boolean): Multiset[A] =
+      Multiset(items filter { case (item, _) => pred(item) })
+
+    override def isEmpty: Boolean = items.isEmpty
+
+    override def iterator: Iterator[A] =
+      items.toIterator flatMap { case (item, count) => Iterator.fill(count)(item) }
+  }
+
   val parts: List[Part] = (for {
     line <- io.Source.stdin.getLines()
     Array(a, b) = line.trim.split("/") map { _.toInt }
@@ -12,7 +40,7 @@ object Day24 extends App {
       else ???
   }
 
-  def validContinuations(prefix: List[Part], parts: Set[Part]): Iterator[List[Part]] = {
+  def validContinuations(prefix: List[Part], parts: Multiset[Part]): Iterator[List[Part]] = {
     val startValue = prefix.headOption map { _.b } getOrElse 0
     val starts = parts filter { p => p.a == startValue || p.b == startValue }
 
@@ -28,15 +56,11 @@ object Day24 extends App {
   def score(bridge: List[Part]): Int = bridge.map(p => p.a + p.b).sum
 
   def solveA(parts: List[Part]): Int =
-    (validContinuations(Nil, parts.toSet) map score).max
+    (validContinuations(Nil, Multiset(parts)) map score).max
 
   def solveB(parts: List[Part]): Int = {
-    val bridge = validContinuations(Nil, parts.toSet) maxBy { b => (b.length, score(b)) }
+    val bridge = validContinuations(Nil, Multiset(parts)) maxBy { b => (b.length, score(b)) }
     score(bridge)
-  }
-
-  if (parts.toSet.size != parts.size) {
-    println("WARNIG: DUPLICATE PARTS! Result may not be accurate!")
   }
 
   println(s"A: ${solveA(parts)}")
