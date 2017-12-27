@@ -40,28 +40,21 @@ object Day24 extends App {
       else ???
   }
 
-  def validContinuations(prefix: List[Part], parts: Multiset[Part]): Iterator[List[Part]] = {
-    val startValue = prefix.headOption map { _.b } getOrElse 0
-    val starts = parts filter { p => p.a == startValue || p.b == startValue }
+  def maxValues(priority: ((Int, Int)) => (Int, Int))(strength: Int, length: Int, last: Int, parts: Multiset[Part]): (Int, Int) = {
+    val nexts = parts filter { p => p.a == last || p.b == last }
 
-    if (starts.isEmpty)
-      List(prefix).toIterator
+    if (nexts.isEmpty)
+      (strength, length)
     else
-      for {
-        start <- starts.toIterator
-        result <- validContinuations(start.align(startValue) +: prefix, parts - start)
-      } yield result
+      nexts
+        .map { next =>
+          maxValues(priority)(strength + next.a + next.b, length + 1, next.align(last).b, parts - next)
+        }
+        .maxBy(priority)
   }
 
-  def score(bridge: List[Part]): Int = bridge.map(p => p.a + p.b).sum
-
-  def solveA(parts: List[Part]): Int =
-    (validContinuations(Nil, Multiset(parts)) map score).max
-
-  def solveB(parts: List[Part]): Int = {
-    val bridge = validContinuations(Nil, Multiset(parts)) maxBy { b => (b.length, score(b)) }
-    score(bridge)
-  }
+  def solveA(parts: List[Part]): Int = maxValues(a => a)(0, 0, 0, Multiset(parts))._1
+  def solveB(parts: List[Part]): Int = maxValues({ case (w, l) => (l, w) })(0, 0, 0, Multiset(parts))._1
 
   println(s"A: ${solveA(parts)}")
   println(s"B: ${solveB(parts)}")
