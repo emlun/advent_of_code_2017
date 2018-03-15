@@ -14,8 +14,9 @@ fn day(name: &str, lines: &Vec<String>) -> i32 {
         },
     }
 
-    println!("A: {}", solver.solve_a(&lines));
-    println!("B: {}", solver.solve_b(&lines));
+    let (a, b) = solver.solve(&lines);
+    println!("A: {}", a);
+    println!("B: {}", b);
 
     0
 }
