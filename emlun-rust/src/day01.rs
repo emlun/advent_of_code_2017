@@ -6,38 +6,42 @@ fn read_digits(input: &Vec<String>) -> Vec<u32> {
         .collect()
 }
 
-pub fn solve_a(input: &Vec<String>) -> u32 {
-    let mut digits: Vec<u32> = read_digits(input);
-    let first: u32 = *digits.first().unwrap();
-    digits.push(first);
+pub struct Solver {}
 
-    digits
-        .windows(2)
-        .fold(
-            0,
-            |sum, window| {
-                let a = window[0];
-                let b = window[1];
-                if a == b { sum + a }
-                else { sum }
-            }
-        )
-}
+impl ::framework::Solver<u32, u32> for Solver {
+    fn solve_a(&self, input: &Vec<String>) -> u32 {
+        let mut digits: Vec<u32> = read_digits(input);
+        let first: u32 = *digits.first().unwrap();
+        digits.push(first);
 
-pub fn solve_b(input: &Vec<String>) -> u32 {
-    let digits: Vec<u32> = read_digits(input);
-    let mut digits_twice = digits.clone();
-    digits_twice.append(&mut digits.clone());
+        digits
+            .windows(2)
+            .fold(
+                0,
+                |sum, window| {
+                    let a = window[0];
+                    let b = window[1];
+                    if a == b { sum + a }
+                    else { sum }
+                }
+            )
+    }
 
-    digits
-        .iter()
-        .enumerate()
-        .fold(
-            0,
-            |sum, (i, a)| {
-                let b = digits[(i + digits.len() / 2) % digits.len()];
-                if *a == b { sum + a }
-                else { sum }
-            }
-        )
+    fn solve_b(&self, input: &Vec<String>) -> u32 {
+        let digits: Vec<u32> = read_digits(input);
+        let mut digits_twice = digits.clone();
+        digits_twice.append(&mut digits.clone());
+
+        digits
+            .iter()
+            .enumerate()
+            .fold(
+                0,
+                |sum, (i, a)| {
+                    let b = digits[(i + digits.len() / 2) % digits.len()];
+                    if *a == b { sum + a }
+                    else { sum }
+                }
+            )
+    }
 }

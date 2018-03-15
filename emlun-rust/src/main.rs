@@ -1,20 +1,39 @@
 mod day01;
+mod framework;
 
-mod util {
-    use std::io::BufRead;
+use framework::Solver;
 
-    pub fn stdin_lines(stdin: ::std::io::Stdin) -> Vec<String> {
-        // ::std::io::stdin()
-        stdin
-            .lock()
-            .lines()
-            .map(|line| line.expect("Failed to read line from stdin"))
-            .collect()
+fn day(name: &str, lines: &Vec<String>) -> i32 {
+    let solver;
+
+    match name.as_ref() {
+        "day01" => solver = day01::Solver {},
+        _ => {
+            println!("Unknown day: {}", name);
+            return 1;
+        },
+    }
+
+    println!("A: {}", solver.solve_a(&lines));
+    println!("B: {}", solver.solve_b(&lines));
+
+    0
+}
+
+fn run() -> i32 {
+    let args: Vec<String> = std::env::args().collect();
+    let lines = framework::stdin_lines(std::io::stdin());
+
+    if args.len() > 1 {
+        day(args[1].as_ref(), &lines)
+    } else {
+        for d in ["01"].iter() {
+            day(d.as_ref(), &lines);
+        }
+        0
     }
 }
 
 fn main() {
-    let lines = util::stdin_lines(std::io::stdin());
-    println!("A: {}", day01::solve_a(&lines));
-    println!("B: {}", day01::solve_b(&lines));
+    std::process::exit(run());
 }
