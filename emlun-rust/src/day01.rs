@@ -1,14 +1,12 @@
-fn read_digits<T>(input: T) -> Vec<u32>
-    where T: Iterator<Item=String>
-{
+fn read_digits(input: &Vec<String>) -> Vec<u32> {
     input
-        .into_iter()
+        .iter()
         .flat_map::<Vec<char>, _>(|line| line.chars().collect())
         .map(|c: char| c.to_digit(10).expect("Invalid digit"))
         .collect()
 }
 
-pub fn solve<T: Iterator<Item=String>>(input: T) -> u32 {
+pub fn solve_a(input: &Vec<String>) -> u32 {
     let mut digits: Vec<u32> = read_digits(input);
     let first: u32 = *digits.first().unwrap();
     digits.push(first);
@@ -21,6 +19,24 @@ pub fn solve<T: Iterator<Item=String>>(input: T) -> u32 {
                 let a = window[0];
                 let b = window[1];
                 if a == b { sum + a }
+                else { sum }
+            }
+        )
+}
+
+pub fn solve_b(input: &Vec<String>) -> u32 {
+    let digits: Vec<u32> = read_digits(input);
+    let mut digits_twice = digits.clone();
+    digits_twice.append(&mut digits.clone());
+
+    digits
+        .iter()
+        .enumerate()
+        .fold(
+            0,
+            |sum, (i, a)| {
+                let b = digits[(i + digits.len() / 2) % digits.len()];
+                if *a == b { sum + a }
                 else { sum }
             }
         )

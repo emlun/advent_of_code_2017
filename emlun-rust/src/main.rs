@@ -14,7 +14,7 @@ mod util {
 }
 
 fn main() {
-    println!("Hello, world!");
-
-    println!("{:?}", day01::solve(util::stdin_lines(std::io::stdin()).into_iter()));
+    let lines = util::stdin_lines(std::io::stdin());
+    println!("A: {}", day01::solve_a(&lines));
+    println!("B: {}", day01::solve_b(&lines));
 }
