@@ -2,7 +2,7 @@ fn read_digits(input: &Vec<String>) -> Vec<u32> {
     input
         .iter()
         .flat_map::<Vec<char>, _>(|line| line.chars().collect())
-        .map(|c: char| c.to_digit(10).expect("Invalid digit"))
+        .map(|c: char| c.to_digit(10).expect(&format!("Invalid digit: {}", c)))
         .collect()
 }
 
