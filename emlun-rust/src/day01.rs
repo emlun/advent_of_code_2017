@@ -18,27 +18,21 @@ impl ::framework::Solver for Solver {
 }
 
 fn solve_a(digits: &Vec<u32>) -> u32 {
-    digits
-        .iter()
-        .enumerate()
-        .fold(
-            0,
-            |sum, (i, &a)| {
-                let b = digits[(i + 1) % digits.len()];
-                if a == b { sum + a }
-                else { sum }
-            }
-        )
+    solve_generic(digits, 1)
 }
 
 fn solve_b(digits: &Vec<u32>) -> u32 {
+    solve_generic(digits, digits.len() / 2)
+}
+
+fn solve_generic(digits: &Vec<u32>, lookahead: usize) -> u32 {
     digits
         .iter()
         .enumerate()
         .fold(
             0,
             |sum, (i, &a)| {
-                let b = digits[(i + digits.len() / 2) % digits.len()];
+                let b = digits[(i + lookahead) % digits.len()];
                 if a == b { sum + a }
                 else { sum }
             }
