@@ -10,17 +10,14 @@ pub struct Solver {}
 
 impl ::framework::Solver<u32, u32> for Solver {
     fn solve_a(&self, input: &Vec<String>) -> u32 {
-        let mut digits: Vec<u32> = read_digits(input);
-        let first: u32 = *digits.first().unwrap();
-        digits.push(first);
-
+        let digits: Vec<u32> = read_digits(input);
         digits
-            .windows(2)
+            .iter()
+            .enumerate()
             .fold(
                 0,
-                |sum, window| {
-                    let a = window[0];
-                    let b = window[1];
+                |sum, (i, &a)| {
+                    let b = digits[(i + 1) % digits.len()];
                     if a == b { sum + a }
                     else { sum }
                 }
@@ -29,17 +26,14 @@ impl ::framework::Solver<u32, u32> for Solver {
 
     fn solve_b(&self, input: &Vec<String>) -> u32 {
         let digits: Vec<u32> = read_digits(input);
-        let mut digits_twice = digits.clone();
-        digits_twice.append(&mut digits.clone());
-
         digits
             .iter()
             .enumerate()
             .fold(
                 0,
-                |sum, (i, a)| {
+                |sum, (i, &a)| {
                     let b = digits[(i + digits.len() / 2) % digits.len()];
-                    if *a == b { sum + a }
+                    if a == b { sum + a }
                     else { sum }
                 }
             )
