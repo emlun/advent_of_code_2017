@@ -1,4 +1,5 @@
 mod day01;
+mod day02;
 mod framework;
 
 use framework::Solver;
@@ -6,6 +7,7 @@ use framework::Solver;
 fn day(name: &str, lines: &Vec<String>) -> i32 {
     let (a, b) = match name.as_ref() {
         "day01" => day01::Solver{}.solve_str(&lines),
+        "day02" => day02::Solver{}.solve_str(&lines),
         _ => {
             println!("Unknown day: {}", name);
             return 1;
