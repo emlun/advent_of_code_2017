@@ -10,8 +10,7 @@ pub struct Solver {}
 impl ::framework::Solver for Solver {
     type A = u32;
     type B = u32;
-
-    fn solve(&self, input: &Vec<String>) -> (u32, u32) {
+    fn solve(&self, input: &Vec<String>) -> (Self::A, Self::B) {
         let digits: Vec<u32> = read_digits(input);
         (solve_a(&digits), solve_b(&digits))
     }
