@@ -4,17 +4,14 @@ mod framework;
 use framework::Solver;
 
 fn day(name: &str, lines: &Vec<String>) -> i32 {
-    let solver;
-
-    match name.as_ref() {
-        "day01" => solver = day01::Solver {},
+    let (a, b) = match name.as_ref() {
+        "day01" => day01::Solver{}.solve_str(&lines),
         _ => {
             println!("Unknown day: {}", name);
             return 1;
         },
-    }
+    };
 
-    let (a, b) = solver.solve(&lines);
     println!("A: {}", a);
     println!("B: {}", b);
 

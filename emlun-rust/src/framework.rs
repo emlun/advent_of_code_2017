@@ -13,4 +13,8 @@ pub trait Solver {
     type B: ToString;
 
     fn solve(&self, input: &Vec<String>) -> (Self::A, Self::B);
+    fn solve_str(&self, input: &Vec<String>) -> (String, String) {
+        let (a, b) = self.solve(input);
+        (a.to_string(), b.to_string())
+    }
 }
