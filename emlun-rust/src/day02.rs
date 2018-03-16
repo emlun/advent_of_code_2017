@@ -23,8 +23,9 @@ fn parse_spreadsheet(lines: &Vec<String>) -> Vec<Vec<i32>> {
         .collect()
 }
 
-fn solve_generic<F>(spreadsheet: &Vec<Vec<i32>>, compute_checksum: F) -> i32
-    where F: (Fn(&Vec<i32>) -> i32)
+fn solve_generic<F, U>(spreadsheet: &Vec<U>, compute_checksum: F) -> i32
+    where F: (Fn(&U) -> i32),
+          U: IntoIterator<Item=i32>,
 {
     spreadsheet.iter().map(compute_checksum).sum()
 }
