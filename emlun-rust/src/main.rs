@@ -2,6 +2,7 @@ mod day01;
 mod day02;
 mod day03;
 mod framework;
+mod util;
 
 use framework::Solver;
 
