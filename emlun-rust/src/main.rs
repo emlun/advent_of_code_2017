@@ -1,6 +1,7 @@
 mod day01;
 mod day02;
 mod day03;
+mod day04;
 mod framework;
 mod util;
 
@@ -11,6 +12,7 @@ fn day(name: &str, lines: &Vec<String>) -> i32 {
         "day01" => day01::Solver{}.solve_str(&lines),
         "day02" => day02::Solver{}.solve_str(&lines),
         "day03" => day03::Solver{}.solve_str(&lines),
+        "day04" => day04::Solver{}.solve_str(&lines),
         _ => {
             println!("Unknown day: {}", name);
             return 1;
