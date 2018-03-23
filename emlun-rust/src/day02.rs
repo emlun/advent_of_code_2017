@@ -2,13 +2,13 @@ pub struct Solver {}
 impl ::framework::Solver for Solver {
     type A = i32;
     type B = i32;
-    fn solve(&self, input: &Vec<String>) -> (Self::A, Self::B) {
+    fn solve(&self, input: &Vec<&str>) -> (Self::A, Self::B) {
         let spreadsheet = parse_spreadsheet(input);
         (solve_generic(&spreadsheet, checksum_a), solve_generic(&spreadsheet, checksum_b))
     }
 }
 
-fn parse_spreadsheet(lines: &Vec<String>) -> Vec<Vec<i32>> {
+fn parse_spreadsheet(lines: &Vec<&str>) -> Vec<Vec<i32>> {
     lines
         .iter()
         .map(|line| {

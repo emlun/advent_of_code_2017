@@ -6,8 +6,8 @@ pub struct Solver {}
 impl ::framework::Solver for Solver {
     type A = u32;
     type B = u32;
-    fn solve(&self, input: &Vec<String>) -> (Self::A, Self::B) {
-        (solve_a(&input), solve_b(&input))
+    fn solve(&self, input: &Vec<&str>) -> (Self::A, Self::B) {
+        (solve_a(&input), solve_b(input))
     }
 }
 
@@ -20,14 +20,14 @@ fn find_level(i: u32) -> u32  {
     (0.5 * ((i as f64).sqrt() - 1.0)).ceil() as u32
 }
 
-fn solve_generic<F>(input: &Vec<String>, solve: F) -> u32
+fn solve_generic<F>(input: &Vec<&str>, solve: F) -> u32
     where F: (Fn(u32) -> u32)
 {
   let cell_num: u32 = input[0].trim().parse().expect(&format!("Invalid decimal number: {}", input[0]));
   solve(cell_num)
 }
 
-fn solve_a(input: &Vec<String>) -> u32 {
+fn solve_a(input: &Vec<&str>) -> u32 {
   solve_generic(input, dist)
 }
 
@@ -82,7 +82,7 @@ fn shell(prev: &Vec<u32>) -> Vec<u32> {
     }
 }
 
-fn solve_b(input: &Vec<String>) -> u32 {
+fn solve_b(input: &Vec<&str>) -> u32 {
     solve_generic(
         input,
         |cell_num: u32|
