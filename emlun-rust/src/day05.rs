@@ -35,11 +35,8 @@ fn solve_b(input: &Vec<&str>) -> u32 {
     solve_generic(
         input,
         |i, jumps| {
-            if jumps[i] >= 3 {
-                jumps[i as usize] -= 1;
-            } else {
-                jumps[i as usize] += 1;
-            }
+            jumps[i as usize] += if jumps[i] >= 3 { -1 }
+                                 else { 1 };
         }
     )
 }
