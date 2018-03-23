@@ -33,7 +33,7 @@ fn run() -> i32 {
         day(args[1].as_ref(), &lines)
     } else {
         for d in ["01"].iter() {
-            day(d.as_ref(), &lines);
+            day(&format!("day{}", d), &lines);
         }
         0
     }
