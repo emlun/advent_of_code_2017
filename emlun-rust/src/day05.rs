@@ -18,9 +18,9 @@ fn solve_generic<F>(input: &Vec<&str>, mutate: F) -> u32
     let mut i: i32 = 0;
 
     while i >= 0 && i < (jumps.len() as i32) {
-        let i_copy = i;
-        i += jumps[i as usize];
-        mutate(i_copy as usize, &mut jumps);
+        let diff = jumps[i as usize];
+        mutate(i as usize, &mut jumps);
+        i += diff;
         steps += 1;
     }
 
