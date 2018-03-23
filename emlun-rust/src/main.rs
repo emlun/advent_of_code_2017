@@ -2,6 +2,7 @@ mod day01;
 mod day02;
 mod day03;
 mod day04;
+mod day05;
 mod framework;
 mod util;
 
@@ -15,6 +16,7 @@ fn day(num: u32, lines: &Vec<&str>, fluff: bool) -> i32 {
         2 => day02::Solver{}.solve_str(lines),
         3 => day03::Solver{}.solve_str(lines),
         4 => day04::Solver{}.solve_str(lines),
+        5 => day05::Solver{}.solve_str(lines),
         _ => {
             println!("Unknown day: {}", num);
             return 1;
@@ -41,7 +43,7 @@ fn run() -> i32 {
         .collect();
 
     let day_nums: Vec<u32> = if args.len() > 0 { args }
-                             else { (1..5).collect() };
+                             else { (1..6).collect() };
 
     for day_num in &day_nums {
         let file_name = format!("input/day{:02}.in", day_num);
