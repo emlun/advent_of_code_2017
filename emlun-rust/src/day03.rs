@@ -1,5 +1,5 @@
 use util;
-use util::Flattenable;
+use util::flatten::Flattenable;
 use std::cmp::max;
 
 pub struct Solver {}
@@ -86,7 +86,7 @@ fn solve_b(input: &Vec<&str>) -> u32 {
     solve_generic(
         input,
         |cell_num: u32|
-            util::iterate(vec![1], shell)
+            util::iterate::iterate(vec![1], shell)
                 .flatten()
                 .find(|&a| a > cell_num)
                 .unwrap()

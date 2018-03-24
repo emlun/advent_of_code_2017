@@ -1,5 +1,5 @@
 use std::collections::HashSet;
-use util::Flattenable;
+use util::flatten::Flattenable;
 
 pub struct Solver {}
 impl ::framework::Solver for Solver {
