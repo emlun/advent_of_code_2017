@@ -16,6 +16,12 @@ struct RawNode {
     children: HashSet<String>,
 }
 
+struct Node {
+    id: String,
+    weight: u32,
+    children: Vec<Node>,
+}
+
 fn parse_tree(input: &Vec<&str>) -> Vec<RawNode> {
     input
         .iter()
@@ -53,6 +59,27 @@ fn parse_tree(input: &Vec<&str>) -> Vec<RawNode> {
         .collect()
 }
 
+fn assemble_tree(input: &Vec<RawNode>) -> Node {
+    let child_node_ids: HashSet<&String> = input.into_iter()
+        .flat_map(|node| node.children.iter())
+        .collect();
+
+    let (children, roots): (Vec<&RawNode>, Vec<&RawNode>) = input
+        .into_iter()
+        .partition(|node| child_node_ids.contains(&node.id));
+
+    if roots.len() != 1 {
+        panic!("Expected exactly one root, found {}", roots.len());
+    }
+
+    let raw_root: &RawNode = roots.first().expect("Expected exactly one root, found none.");
+
+    println!("child_node_ids: {:?}", child_node_ids);
+    println!("children: {:?}", children);
+    println!("roots: {:?}", roots);
+    unimplemented!();
+}
+
 fn solve_a(input: &Vec<&str>) -> String {
 
     let nodes: Vec<RawNode> = parse_tree(input);
@@ -62,7 +89,7 @@ fn solve_a(input: &Vec<&str>) -> String {
         .cloned()
         .collect();
 
-    let (_, mut roots): (Vec<RawNode>, Vec<RawNode>) = nodes
+    let (children, mut roots): (Vec<RawNode>, Vec<RawNode>) = nodes
         .into_iter()
         .partition(|node| child_node_ids.contains(&node.id));
 
