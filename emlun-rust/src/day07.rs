@@ -16,6 +16,7 @@ struct RawNode {
     children: HashSet<String>,
 }
 
+#[derive(Debug)]
 struct Node {
     id: String,
     weight: u32,
@@ -59,25 +60,42 @@ fn parse_tree(input: &Vec<&str>) -> Vec<RawNode> {
         .collect()
 }
 
-fn assemble_tree(input: &Vec<RawNode>) -> Node {
-    let child_node_ids: HashSet<&String> = input.into_iter()
+fn assemble_tree(raw_nodes: Vec<RawNode>) -> Vec<Node> {
+    let child_node_ids: HashSet<String> = raw_nodes.iter()
         .flat_map(|node| node.children.iter())
+        .cloned()
         .collect();
 
-    let (children, roots): (Vec<&RawNode>, Vec<&RawNode>) = input
-        .into_iter()
-        .partition(|node| child_node_ids.contains(&node.id));
-
-    if roots.len() != 1 {
-        panic!("Expected exactly one root, found {}", roots.len());
-    }
-
-    let raw_root: &RawNode = roots.first().expect("Expected exactly one root, found none.");
+    let (children, raw_roots): (Vec<&RawNode>, Vec<&RawNode>) = raw_nodes
+        .iter()
+        .partition(|node|
+            child_node_ids.contains(&node.id)
+        );
 
     println!("child_node_ids: {:?}", child_node_ids);
-    println!("children: {:?}", children);
-    println!("roots: {:?}", roots);
-    unimplemented!();
+    println!("raw_roots: {:?}", raw_roots);
+
+    assemble_subtree(raw_roots, &children)
+}
+
+fn assemble_subtree(roots: Vec<&RawNode>, rest: &Vec<&RawNode>) -> Vec<Node> {
+    roots.iter()
+        .map(|root| {
+            let (children, rest): (Vec<&RawNode>, Vec<&RawNode>) = rest
+                .iter()
+                .partition(|child|
+                    root.children.contains(&child.id)
+                );
+
+            let children = assemble_subtree(children, &rest);
+
+            Node {
+                id: root.id.clone(),
+                weight: root.weight,
+                children,
+            }
+        })
+        .collect()
 }
 
 fn solve_a(input: &Vec<&str>) -> String {
@@ -103,5 +121,12 @@ fn solve_a(input: &Vec<&str>) -> String {
 }
 
 fn solve_b(input: &Vec<&str>) -> u32 {
+    let raw_nodes = parse_tree(input);
+
+    let roots = assemble_tree(raw_nodes);
+
+    println!("roots: {:?}", roots.iter().map(|n| &n.id).collect::<Vec<&String>>());
+    println!("root children: {:?}", roots.iter().flat_map(|r| &r.children).map(|n| &n.id).collect::<Vec<&String>>());
+
     0
 }
