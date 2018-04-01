@@ -158,18 +158,23 @@ fn find_unbalanced_node(root: &Node) -> FindUnbalancedResult {
 
             let weight_counts: HashMap<&u32, u32> = child_weights.iter().counts();
 
-            let bad_weight = child_weights.iter()
+            let (good_weights, bad_weights): (Vec<(usize, &u32)>, Vec<(usize, &u32)>) = child_weights.iter()
                 .enumerate()
-                .find(|&(_, w)| weight_counts[w] == 1);
+                .partition(|&(_, w)| *weight_counts.get(w).unwrap_or(&0) > 1);
 
-            match bad_weight {
+            match bad_weights.first() {
                 None => ParentOf(&root),
-                Some((i, _)) => {
+                Some(&(i, _)) => {
                     let bad_node = &root.children[i];
 
                     let prelim_result = find_unbalanced_node(bad_node);
 
-                    finish_result(root, &weight_counts, prelim_result)
+                    let good_weight = *good_weights
+                        .first()
+                        .expect("No correct weight found.")
+                        .1;
+
+                    finish_result(root, good_weight, prelim_result)
                 }
             }
         }
@@ -178,16 +183,11 @@ fn find_unbalanced_node(root: &Node) -> FindUnbalancedResult {
 
 fn finish_result<'a>(
     parent: &'a Node,
-    weight_counts: &HashMap<&u32, u32>,
+    correct_total_weight: u32,
     result: FindUnbalancedResult<'a>
 ) -> FindUnbalancedResult<'a> {
     match result {
         ParentOf(bad_node) => {
-            let correct_total_weight: &u32 = weight_counts.iter()
-                .find(|&(_, &count)| count > 1)
-                .map(|(w, _)| w)
-                .unwrap();
-
             let total_children_weight = bad_node.children.iter()
                 .map(compute_weight)
                 .fold(0, |sum, w| sum + w);
