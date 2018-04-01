@@ -24,6 +24,15 @@ struct Node {
     weight: u32,
     children: Vec<Node>,
 }
+impl Node {
+    fn total_weight(&self) -> u32 {
+        self.weight
+            + self.children
+                .iter()
+                .map(Node::total_weight)
+                .fold(0, |sum, child_weight| sum + child_weight)
+    }
+}
 
 fn parse_tree(input: &Vec<&str>) -> Vec<RawNode> {
     input
@@ -153,7 +162,7 @@ fn find_unbalanced_node(root: &Node) -> FindUnbalancedResult {
         1 => find_unbalanced_node(&root.children[0]),
         _ => {
             let child_weights: Vec<u32> = root.children.iter()
-                .map(compute_weight)
+                .map(Node::total_weight)
                 .collect();
 
             let weight_counts: HashMap<&u32, u32> = child_weights.iter().counts();
@@ -189,7 +198,7 @@ fn finish_result<'a>(
     match result {
         ParentOf(bad_node) => {
             let total_children_weight = bad_node.children.iter()
-                .map(compute_weight)
+                .map(Node::total_weight)
                 .fold(0, |sum, w| sum + w);
 
             FinalResult(
@@ -199,12 +208,4 @@ fn finish_result<'a>(
         }
         FinalResult(_, _) => result
     }
-}
-
-fn compute_weight(node: &Node) -> u32 {
-    node.weight
-        + node.children
-            .iter()
-            .map(compute_weight)
-            .fold(0, |sum, child_weight| sum + child_weight)
 }
