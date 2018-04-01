@@ -73,9 +73,6 @@ fn assemble_tree(raw_nodes: Vec<RawNode>) -> Vec<Node> {
             child_node_ids.contains(&node.id)
         );
 
-    println!("child_node_ids: {:?}", child_node_ids);
-    println!("raw_roots: {:?}", raw_roots);
-
     assemble_subtree(raw_roots, &children)
 }
 
@@ -100,7 +97,6 @@ fn assemble_subtree(roots: Vec<&RawNode>, rest: &Vec<&RawNode>) -> Vec<Node> {
 }
 
 fn solve_a(input: &Vec<&str>) -> String {
-
     let nodes: Vec<RawNode> = parse_tree(input);
 
     let child_node_ids: HashSet<String> = nodes.iter()
@@ -108,17 +104,18 @@ fn solve_a(input: &Vec<&str>) -> String {
         .cloned()
         .collect();
 
-    let (children, mut roots): (Vec<RawNode>, Vec<RawNode>) = nodes
-        .into_iter()
-        .partition(|node| child_node_ids.contains(&node.id));
+    let mut roots: (Vec<&RawNode>) = nodes
+        .iter()
+        .filter(|node| !child_node_ids.contains(&node.id))
+        .collect();
 
     if roots.len() != 1 {
         panic!("Expected exactly one root, found {}", roots.len());
     }
 
-    let raw_root: RawNode = roots.pop().expect("Expected exactly one root, found none.");
+    let raw_root: &RawNode = roots.pop().expect("Expected exactly one root, found none.");
 
-    String::from(raw_root.id)
+    raw_root.id.clone()
 }
 
 fn solve_b(input: &Vec<&str>) -> u32 {
@@ -131,15 +128,7 @@ fn solve_b(input: &Vec<&str>) -> u32 {
         children: roots,
     };
 
-    println!("roots: {:?}", root.children.iter().map(|n| &n.id).collect::<Vec<&String>>());
-    println!("root children: {:?}", root.children.iter().flat_map(|r| &r.children).map(|n| &n.id).collect::<Vec<&String>>());
-
-    println!("root weight: {}", compute_weight(&root));
-
-    if let FinalResult(bad_node, correct_weight) = find_unbalanced_node(&root) {
-        println!("bad node: {}", bad_node.id);
-        println!("correct weight: {}", correct_weight);
-
+    if let FinalResult(_, correct_weight) = find_unbalanced_node(&root) {
         correct_weight
     } else {
         panic!("Bad node not found.");
@@ -188,20 +177,6 @@ fn find_unbalanced_node(root: &Node) -> FindUnbalancedResult {
                     let prelim_result = find_unbalanced_node(bad_node);
 
                     finish_result(root, &weight_counts, prelim_result)
-
-                    // let correct_total_weight = weight_counts.iter()
-                        // .find(|&(_, &count)| count > 1)
-                        // .map(|(w, _)| w)
-                        // .unwrap();
-
-                    // let total_children_weight = bad_node.children.iter()
-                        // .map(compute_weight)
-                        // .fold(0, |sum, w| sum + w);
-
-                    // FinalResult(
-                        // &root.children[i],
-                        // correct_total_weight - total_children_weight
-                    // )
                 }
             }
         }
