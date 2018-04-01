@@ -1,3 +1,4 @@
+use util::countable::Countable;
 use std::collections::HashMap;
 use std::collections::HashSet;
 
@@ -155,15 +156,7 @@ fn find_unbalanced_node(root: &Node) -> FindUnbalancedResult {
                 .map(compute_weight)
                 .collect();
 
-            let weight_counts: HashMap<u32, u32> = child_weights.iter()
-                .fold(
-                    HashMap::new(),
-                    |mut map, &w| {
-                        let current_count = *map.entry(w).or_insert(0);
-                        map.insert(w, current_count + 1);
-                        map
-                    }
-                );
+            let weight_counts: HashMap<&u32, u32> = child_weights.iter().counts();
 
             let bad_weight = child_weights.iter()
                 .enumerate()
@@ -185,12 +178,12 @@ fn find_unbalanced_node(root: &Node) -> FindUnbalancedResult {
 
 fn finish_result<'a>(
     parent: &'a Node,
-    weight_counts: &HashMap<u32, u32>,
+    weight_counts: &HashMap<&u32, u32>,
     result: FindUnbalancedResult<'a>
 ) -> FindUnbalancedResult<'a> {
     match result {
         ParentOf(bad_node) => {
-            let correct_total_weight = weight_counts.iter()
+            let correct_total_weight: &u32 = weight_counts.iter()
                 .find(|&(_, &count)| count > 1)
                 .map(|(w, _)| w)
                 .unwrap();
