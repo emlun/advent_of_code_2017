@@ -7,7 +7,20 @@ impl ::framework::Solver for Solver {
     type A = String;
     type B = u32;
     fn solve(&self, input: &Vec<&str>) -> (Self::A, Self::B) {
-        (solve_a(&input), solve_b(&input))
+        let raw_nodes = parse_tree(input);
+
+        let roots: Vec<Node> = assemble_tree(raw_nodes);
+
+        if roots.len() != 1 {
+            panic!("Expected exactly one root, found {}", roots.len());
+        }
+
+        let root = roots
+            .into_iter()
+            .next()
+            .expect("Expected exactly one root, found none.");
+
+        (solve_a(&root), solve_b(&root))
     }
 }
 
@@ -108,41 +121,12 @@ fn assemble_subtree(root_id: String, root: RawNode, children: &mut HashMap<Strin
     }
 }
 
-fn solve_a(input: &Vec<&str>) -> String {
-    let mut nodes: HashMap<String, RawNode> = parse_tree(input);
-
-    let child_node_ids: HashSet<String> = nodes
-        .values()
-        .flat_map(|node| node.children.iter())
-        .cloned()
-        .collect();
-
-    nodes.retain(|id, _| !child_node_ids.contains(id));
-    let mut roots: (HashMap<String, RawNode>) = nodes;
-
-    if roots.len() != 1 {
-        panic!("Expected exactly one root, found {}", roots.len());
-    }
-
-    let (root_id, _) = roots
-        .drain()
-        .next()
-        .expect("Expected exactly one root, found none.");
-
-    root_id
+fn solve_a(root: &Node) -> String {
+    root.id.clone()
 }
 
-fn solve_b(input: &Vec<&str>) -> u32 {
-    let raw_nodes = parse_tree(input);
-
-    let roots: Vec<Node> = assemble_tree(raw_nodes);
-    let root = Node {
-        id: String::from("root"),
-        weight: 0,
-        children: roots,
-    };
-
-    if let FinalResult(_, correct_weight) = find_unbalanced_node(&root) {
+fn solve_b(root: &Node) -> u32 {
+    if let FinalResult(_, correct_weight) = find_unbalanced_node(root) {
         correct_weight
     } else {
         panic!("Bad node not found.");
