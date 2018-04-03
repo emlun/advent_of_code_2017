@@ -42,7 +42,7 @@ impl Node {
             + self.children
                 .iter()
                 .map(Node::total_weight)
-                .fold(0, |sum, child_weight| sum + child_weight)
+                .sum::<u32>()
     }
 }
 
