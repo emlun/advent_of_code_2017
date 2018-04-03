@@ -110,7 +110,7 @@ fn assemble_subtree(root_id: String, root: RawNode, children: &mut HashMap<Strin
     let children: Vec<Node> = root.children.into_iter()
         .map(|child_id| {
             let child = children.remove(&child_id).expect(&format!("Child disappeared: {}", &child_id));
-            assemble_subtree( child_id, child, children)
+            assemble_subtree(child_id, child, children)
         })
         .collect();
 
