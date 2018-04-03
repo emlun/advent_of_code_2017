@@ -13,7 +13,6 @@ impl ::framework::Solver for Solver {
 
 #[derive(Debug)]
 struct RawNode {
-    id: String,
     weight: u32,
     children: HashSet<String>,
 }
@@ -34,7 +33,7 @@ impl Node {
     }
 }
 
-fn parse_tree(input: &Vec<&str>) -> Vec<RawNode> {
+fn parse_tree(input: &Vec<&str>) -> HashMap<String, RawNode> {
     input
         .iter()
         .map(|line| {
@@ -44,7 +43,10 @@ fn parse_tree(input: &Vec<&str>) -> Vec<RawNode> {
             let children_part = arrow_split.next();
 
             let mut node_split = node_part.split(" ");
-            let id = node_split.next().expect(&format!("Failed to parse node ID from line: {}", line));
+            let id: String = String::from(
+                node_split.next()
+                    .expect(&format!("Failed to parse node ID from line: {}", line))
+            );
             let weight: u32 = node_split.next()
                 .and_then(|word|
                     word.chars()
@@ -62,70 +64,72 @@ fn parse_tree(input: &Vec<&str>) -> Vec<RawNode> {
                 .map(String::from)
                 .collect();
 
-            RawNode {
-                id: String::from(id),
-                weight,
-                children,
-            }
+            (id,
+                RawNode {
+                    weight,
+                    children,
+                }
+            )
         })
         .collect()
 }
 
-fn assemble_tree(raw_nodes: Vec<RawNode>) -> Vec<Node> {
-    let child_node_ids: HashSet<String> = raw_nodes.iter()
+fn assemble_tree(raw_nodes: HashMap<String, RawNode>) -> Vec<Node> {
+    let child_node_ids: HashSet<String> = raw_nodes.values()
         .flat_map(|node| node.children.iter())
         .cloned()
         .collect();
 
-    let (children, raw_roots): (Vec<&RawNode>, Vec<&RawNode>) = raw_nodes
-        .iter()
-        .partition(|node|
-            child_node_ids.contains(&node.id)
+    let (mut children, raw_roots): (HashMap<String, RawNode>, HashMap<String, RawNode>) = raw_nodes
+        .into_iter()
+        .partition(|&(ref id, _)|
+            child_node_ids.contains(id)
         );
 
-    assemble_subtree(raw_roots, &children)
+    raw_roots.into_iter()
+        .map(|(id, root)|
+            assemble_subtree(id, root, &mut children)
+        )
+        .collect()
 }
 
-fn assemble_subtree(roots: Vec<&RawNode>, rest: &Vec<&RawNode>) -> Vec<Node> {
-    roots.iter()
-        .map(|root| {
-            let (children, rest): (Vec<&RawNode>, Vec<&RawNode>) = rest
-                .iter()
-                .partition(|child|
-                    root.children.contains(&child.id)
-                );
-
-            let children = assemble_subtree(children, &rest);
-
-            Node {
-                id: root.id.clone(),
-                weight: root.weight,
-                children,
-            }
+fn assemble_subtree(root_id: String, root: RawNode, children: &mut HashMap<String, RawNode>) -> Node {
+    let children: Vec<Node> = root.children.into_iter()
+        .map(|child_id| {
+            let child = children.remove(&child_id).expect(&format!("Child disappeared: {}", &child_id));
+            assemble_subtree( child_id, child, children)
         })
-        .collect()
+        .collect();
+
+    Node {
+        id: root_id,
+        weight: root.weight,
+        children,
+    }
 }
 
 fn solve_a(input: &Vec<&str>) -> String {
-    let nodes: Vec<RawNode> = parse_tree(input);
+    let mut nodes: HashMap<String, RawNode> = parse_tree(input);
 
-    let child_node_ids: HashSet<String> = nodes.iter()
+    let child_node_ids: HashSet<String> = nodes
+        .values()
         .flat_map(|node| node.children.iter())
         .cloned()
         .collect();
 
-    let mut roots: (Vec<&RawNode>) = nodes
-        .iter()
-        .filter(|node| !child_node_ids.contains(&node.id))
-        .collect();
+    nodes.retain(|id, _| !child_node_ids.contains(id));
+    let mut roots: (HashMap<String, RawNode>) = nodes;
 
     if roots.len() != 1 {
         panic!("Expected exactly one root, found {}", roots.len());
     }
 
-    let raw_root: &RawNode = roots.pop().expect("Expected exactly one root, found none.");
+    let (root_id, _) = roots
+        .drain()
+        .next()
+        .expect("Expected exactly one root, found none.");
 
-    raw_root.id.clone()
+    root_id
 }
 
 fn solve_b(input: &Vec<&str>) -> u32 {
