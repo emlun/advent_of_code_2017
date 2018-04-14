@@ -1,24 +1,33 @@
 pub struct Solver {}
 impl ::framework::Solver for Solver {
     type A = u32;
-    type B = i32;
+    type B = u32;
     fn solve(&self, input: &Vec<&str>) -> (Self::A, Self::B) {
-        (solve_a(input), solve_b(input))
+
+        let mut state = State::new();
+
+        input.iter()
+            .flat_map(|line| line.chars())
+            .for_each(|next| step(&mut state, next));
+
+        (state.score, state.garbage_count)
     }
 }
 
 struct State {
     depth: u32,
-    in_garbage: bool,
+    garbage_count: u32,
     ignore_next: bool,
+    in_garbage: bool,
     score: u32,
 }
 impl State {
     fn new() -> State {
         State {
             depth: 0,
-            in_garbage: false,
+            garbage_count: 0,
             ignore_next: false,
+            in_garbage: false,
             score: 0,
         }
     }
@@ -32,7 +41,7 @@ fn step(state: &mut State, next: char) {
             match next {
                 '!' => { state.ignore_next = true; }
                 '>' => { state.in_garbage = false; }
-                _   => {}
+                _   => { state.garbage_count += 1; }
             }
         }
     } else {
@@ -47,18 +56,4 @@ fn step(state: &mut State, next: char) {
             _   => panic!(format!("Unknown non-garbage: {}", next))
         }
     }
-}
-
-fn solve_a(input: &Vec<&str>) -> u32 {
-    let mut state = State::new();
-
-    input.iter()
-        .flat_map(|line| line.chars())
-        .for_each(|next| step(&mut state, next));
-
-    state.score
-}
-
-fn solve_b(input: &Vec<&str>) -> i32 {
-    0
 }
